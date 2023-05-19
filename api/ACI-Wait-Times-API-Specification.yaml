@@ -1,11 +1,11 @@
-openapi: 3.0.1
+openapi: 3.0.3
 info:
   title: ACI Wait Times API
   description: Retrieves Wait Times content.
   contact:
     name: ACI
-    url: 'http://www.aci.aero/'
-  version: '1.5'
+    url: 'https://aci.aero/'
+  version: '1.6.0'
 servers:
   - url: 'https://aci.aero'
 tags:
@@ -16,16 +16,17 @@ tags:
   - name: Queue Measurements
     description: ACI Queue Measurements
 paths:
-  '/aci/airports/{Airport ICAO Code}/checkpoints':
+  '/airports/{AirportIcaoCode}/checkpoints':
     get:
       tags:
         - Checkpoint Facilities
+      description: This URI will return a list of CheckpointFacility objects.
       summary: >-
-        Returns all of the security CheckPointFacility at the AirportFacility
-        specified by ICAO Code grouped by TerminalFacility
-      operationId: getCheckPointFacilitiesByAirportIdUsingGET
+        Returns all of the security Checkpoint Facilities at the Airport Facility
+        specified by ICAO Code
+      operationId: getCheckpointFacilitiesByAirportId
       parameters:
-        - name: Airport ICAO Code
+        - name: AirportIcaoCode
           in: path
           description: Four-letter Airport ICAO Code
           required: true
@@ -34,55 +35,35 @@ paths:
         - name: page
           in: query
           description: page
+          required: false
           schema:
             type: integer
             format: int32
-            default: 0
         - name: size
           in: query
           description: size
+          required: false
           schema:
             type: integer
             format: int32
-            default: 20
       responses:
         '200':
           description: OK
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  CheckPointFacility:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/CheckPointFacility'
-            application/xml:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/CheckPointFacility'
-                xml:
-                  name: CheckPointFacility
-        '401':
-          description: Unauthorized
-          content: {}
-        '403':
-          description: Forbidden
-          content: {}
-        '404':
-          description: Not Found
-          content: {}
-  '/aci/airports/{Airport ICAO Code}/queues':
+                $ref: '#/components/schemas/PaginatedCheckpointFacilityList'
+  '/airports/{AirportIcaoCode}/queues':
     get:
       tags:
         - Passenger Queues
+      description: This URI will return a list of PassengerQueue objects.
       summary: >-
         Returns all of the PassengerQueue(s) at the AirportFacility specified by
-        ICAO Code grouped by CheckPointFacility
-      operationId: getPassengerQueuesByAirportIdUsingGET
+        ICAO Code grouped by CheckpointFacility
+      operationId: getPassengerQueuesByAirportId
       parameters:
-        - name: Airport ICAO Code
+        - name: AirportIcaoCode
           in: path
           description: Four-letter Airport ICAO Code
           required: true
@@ -91,61 +72,42 @@ paths:
         - name: page
           in: query
           description: page
+          required: false
           schema:
             type: integer
             format: int32
-            default: 0
         - name: size
           in: query
           description: size
+          required: false
           schema:
             type: integer
             format: int32
-            default: 20
       responses:
         '200':
           description: OK
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  PassengerQueue:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/PassengerQueue'
-            application/xml:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/PassengerQueue'
-                xml:
-                  name: PassengerQueue
-        '401':
-          description: Unauthorized
-          content: {}
-        '403':
-          description: Forbidden
-          content: {}
-        '404':
-          description: Not Found
-          content: {}
-  '/aci/airports/{Airport ICAO Code}/checkpoints/{Checkpoint UUID}':
+                $ref: '#/components/schemas/PaginatedPassengerQueueList'
+  '/airports/{AirportIcaoCode}/checkpoints/{CheckpointFacilityIdentifier}':
     get:
       tags:
         - Checkpoint Facilities
-      summary: Returns a specific checkpoint identified by checkpoint UUID
-      operationId: getCheckPointFacilityByAirportIdCheckPointIdUsingGET
+      description: This URI will return a single CheckpointFacility object.
+      summary: >-
+        Returns a specific CheckpointFacility identified by CheckpointFacility Identifier
+      operationId: getCheckpointFacilityByAirportIdCheckpointId
       parameters:
-        - name: Airport ICAO Code
+        - name: AirportIcaoCode
           in: path
           description: Four-letter Airport ICAO Code
           required: true
           schema:
             type: string
-        - name: Checkpoint UUID
+        - name: CheckpointFacilityIdentifier
           in: path
-          description: 32 Hexadecimal Digit Checkpoint UUID, in RFC 4122 defined format
+          description: Unique identifier for the Checkpoint Facility. The identifier should be unique within an Airport.
           required: true
           schema:
             type: string
@@ -155,105 +117,73 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  CheckPointFacility:
-                    $ref: '#/components/schemas/CheckPointFacility'
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/CheckPointFacility'
-        '401':
-          description: Unauthorized
-          content: {}
-        '403':
-          description: Forbidden
-          content: {}
-        '404':
-          description: Not Found
-          content: {}
-  '/aci/airports/{Airport ICAO Code}/checkpoints/{Checkpoint UUID}/queues':
+                $ref: '#/components/schemas/CheckpointFacility'
+  '/airports/{AirportIcaoCode}/checkpoints/{CheckpointFacilityIdentifier}/queues':
     get:
       tags:
         - Passenger Queues
-      summary: Returns all of the PassengerQueue(s) at the specified CheckpointFacility
-      operationId: getPassengerQueuesByAirportIdCheckPointIdUsingGET
+      description: This URI will return a list of PassengerQueue objects.
+      summary: >-
+        Returns all of the PassengerQueue(s) at the specified CheckpointFacility
+      operationId: getPassengerQueuesByAirportIdCheckpointId
       parameters:
-        - name: Airport ICAO Code
+        - name: AirportIcaoCode
           in: path
           description: Four-letter Airport ICAO Code
           required: true
           schema:
             type: string
-        - name: Checkpoint UUID
+        - name: CheckpointFacilityIdentifier
           in: path
-          description: 32 Hexadecimal Digit Checkpoint UUID, in RFC 4122 defined format
+          description: Unique identifier for the Checkpoint Facility. The identifier should be unique within an Airport.
           required: true
           schema:
             type: string
         - name: page
           in: query
           description: page
+          required: false
           schema:
             type: integer
             format: int32
-            default: 0
         - name: size
           in: query
           description: size
+          required: false
           schema:
             type: integer
             format: int32
-            default: 20
       responses:
         '200':
           description: OK
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  PassengerQueue:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/PassengerQueue'
-            application/xml:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/PassengerQueue'
-                xml:
-                  name: PassengerQueue
-        '401':
-          description: Unauthorized
-          content: {}
-        '403':
-          description: Forbidden
-          content: {}
-        '404':
-          description: Not Found
-          content: {}
-  '/aci/airports/{Airport ICAO Code}/checkpoints/{Checkpoint UUID}/queues/{Queue UUID}':
+                $ref: '#/components/schemas/PaginatedPassengerQueueList'
+  '/airports/{AirportIcaoCode}/checkpoints/{CheckpointFacilityIdentifier}/queues/{QueueIdentifier}':
     get:
       tags:
         - Passenger Queues
-      summary: Returns the specific PassengerQueue at the specified CheckPointFacility
-      operationId: getPassengerQueueByAirportIdCheckPointIdQueueIdUsingGET
+      description: This URI will return a single PassengerQueue object.
+      summary: >-
+        Returns the specific PassengerQueue at the specified CheckpointFacility
+      operationId: getPassengerQueueByAirportIdCheckpointIdQueueId
       parameters:
-        - name: Airport ICAO Code
+        - name: AirportIcaoCode
           in: path
           description: Four-letter Airport ICAO Code
           required: true
           schema:
             type: string
-        - name: Checkpoint UUID
+        - name: CheckpointFacilityIdentifier
           in: path
-          description: 32 Hexadecimal Digit Checkpoint UUID, in RFC 4122 defined format
+          description: Unique identifier for the Checkpoint Facility. The identifier should be unique within an Airport.
           required: true
           schema:
             type: string
-        - name: Queue UUID
+        - name: QueueIdentifier
           in: path
-          description: 32 Hexadecimal Digit Queue UUID, in RFC 4122 defined format
+          description: Unique identifier for the Passenger Queue. The identifier should be unique within an Airport.
           required: true
           schema:
             type: string
@@ -262,198 +192,180 @@ paths:
           description: OK
           content:
             application/json:
-              schema:
-                type: object
-                properties:
-                  PassengerQueue:
-                    $ref: '#/components/schemas/PassengerQueue'
-            application/xml:
               schema:
                 $ref: '#/components/schemas/PassengerQueue'
-        '401':
-          description: Unauthorized
-          content: {}
-        '403':
-          description: Forbidden
-          content: {}
-        '404':
-          description: Not Found
-          content: {}
-  '/aci/airports/{Airport ICAO Code}/checkpoints/{Checkpoint UUID}/measurements':
+  '/airports/{AirportIcaoCode}/checkpoints/{CheckpointFacilityIdentifier}/measurements':
     get:
       tags:
         - Queue Measurements
+      description: This URI will return a list of QueueMeasurement objects.
       summary: >-
-        Returns all the wait time metrics for all
-        PassengerQueue(s) at the specified CheckPointFacility
-      operationId: getQueueMeasurementsByAirportIdCheckPointIdUsingGET
+        Returns all the wait time metrics for all PassengerQueue(s)
+        at the specified CheckpointFacility
+      operationId: getQueueMeasurementsByAirportIdCheckpointId
       parameters:
-        - name: Airport ICAO Code
+        - name: AirportIcaoCode
           in: path
           description: Four-letter Airport ICAO Code
           required: true
           schema:
             type: string
-        - name: Checkpoint UUID
+        - name: CheckpointFacilityIdentifier
           in: path
-          description: 32 Hexadecimal Digit Checkpoint UUID, in RFC 4122 defined format
+          description: Unique identifier for the Checkpoint Facility. The identifier should be unique within an Airport.
           required: true
           schema:
             type: string
         - name: page
           in: query
           description: page
+          required: false
           schema:
             type: integer
             format: int32
-            default: 0
         - name: size
           in: query
           description: size
+          required: false
           schema:
             type: integer
             format: int32
-            default: 20
       responses:
         '200':
           description: OK
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  QueueMeasurement:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/QueueMeasurement'
-            application/xml:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/QueueMeasurement'
-                xml:
-                  name: QueueMeasurement
-        '401':
-          description: Unauthorized
-          content: {}
-        '403':
-          description: Forbidden
-          content: {}
-        '404':
-          description: Not Found
-          content: {}
-  '/aci/airports/{Airport ICAO Code}/checkpoints/{Checkpoint UUID}/queues/{Queue UUID}/measurements':
+                $ref: '#/components/schemas/PaginatedQueueMeasurementList'
+  '/airports/{AirportIcaoCode}/checkpoints/{CheckpointFacilityIdentifier}/queues/{QueueIdentifier}/measurements':
     get:
       tags:
         - Queue Measurements
+      description: This URI will return a single QueueMeasurement object.
       summary: >-
-        Returns all the wait time metrics for the specific PassengerQueue at the specified
-        security CheckPointFacility
-      operationId: getQueueMeasurementsByAirportIdCheckPointIdQueueIdUsingGET
+        Returns the latest wait time metrics for the specific PassengerQueue
+        at the specified security CheckpointFacility
+      operationId: getQueueMeasurementByAirportIdCheckpointIdQueueId
       parameters:
-        - name: Airport ICAO Code
+        - name: AirportIcaoCode
           in: path
           description: Four-letter Airport ICAO Code
           required: true
           schema:
             type: string
-        - name: Checkpoint UUID
+        - name: CheckpointFacilityIdentifier
           in: path
-          description: 32 Hexadecimal Digit Checkpoint UUID, in RFC 4122 defined format
+          description: Unique identifier for the Checkpoint Facility. The identifier should be unique within an Airport.
           required: true
           schema:
             type: string
-        - name: Queue UUID
+        - name: QueueIdentifier
           in: path
-          description: 32 Hexadecimal Digit Queue UUID, in RFC 4122 defined format
+          description: Unique identifier for the Passenger Queue. The identifier should be unique within an Airport.
           required: true
           schema:
             type: string
-        - name: page
-          in: query
-          description: page
-          schema:
-            type: integer
-            format: int32
-            default: 0
-        - name: size
-          in: query
-          description: size
-          schema:
-            type: integer
-            format: int32
-            default: 20
       responses:
         '200':
           description: OK
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  QueueMeasurement:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/QueueMeasurement'
-            application/xml:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/QueueMeasurement'
-                xml:
-                  name: QueueMeasurement
-        '401':
-          description: Unauthorized
-          content: {}
-        '403':
-          description: Forbidden
-          content: {}
-        '404':
-          description: Not Found
-          content: {}
+                $ref: '#/components/schemas/QueueMeasurement'
     put:
       tags:
         - Queue Measurements
+      description: This URI will create or update a single QueueMeasurement object.
       summary: 'Sets all wait time metrics at a given queue for a specified time'
-      operationId: putCurrentQueueMeasurementsByAirportIdCheckPointIdQueueIdUsingPUT
+      operationId: putCurrentQueueMeasurementByAirportIdCheckpointIdQueueId
       parameters:
-        - name: Airport ICAO Code
+        - name: AirportIcaoCode
           in: path
           description: Four-letter Airport ICAO Code
           required: true
           schema:
             type: string
-        - name: Checkpoint UUID
+        - name: CheckpointFacilityIdentifier
           in: path
-          description: 32 Hexadecimal Digit Checkpoint UUID, in RFC 4122 defined format
+          description: Unique identifier for the Checkpoint Facility. The identifier should be unique within an Airport.
           required: true
           schema:
             type: string
-        - name: Queue UUID
+        - name: QueueIdentifier
           in: path
-          description: 32 Hexadecimal Digit Queue UUID, in RFC 4122 defined format
+          description: Unique identifier for the Passenger Queue. The identifier should be unique within an Airport.
           required: true
           schema:
             type: string
       requestBody:
-        required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CurrentWaitTime'
-          application/xml:
-            schema:
-              $ref: '#/components/schemas/CurrentWaitTime'
+              type: object
+              additionalProperties: {}
+            examples:
+              PUTAllMetrics:
+                value:
+                  Occupancy: 0
+                  ProjectedWaitTime: 0
+                  Throughput: 0
+                  WaitTime: 0
+                  EndTime: '2022-01-01T00:00:00Z'
+                summary: Create/Update All Metrics
+                description: Sets all wait time metrics at a given queue for a specified
+                  time
       responses:
-        '201':
+        '200':
           description: Created
-          content: {}
-        '401':
-          description: Unauthorized
-          content: {}
-        '403':
-          description: Forbidden
-          content: {}
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QueueMeasurement'
+  '/airports/{AirportIcaoCode}/checkpoints/{CheckpointFacilityIdentifier}/queues/{QueueIdentifier}/measurements/history':
+    get:
+      tags:
+      - Queue Measurements
+      operationId: getQueueMeasurementHistoryByAirportIdCheckpointIdQueueId
+      description: This URI will return a list of QueueMeasurement objects.
+      summary: Returns the history of wait time metrics for the specific PassengerQueue
+        at the specified security CheckpointFacility
+      parameters:
+      - in: path
+        name: AirportIcaoCode
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: CheckpointFacilityIdentifier
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: QueueIdentifier
+        required: true
+        schema:
+          type: string
+      - name: page
+        in: query
+        description: A page number within the paginated result set.
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - name: size
+        in: query
+        description: Number of results to return per page.
+        required: false
+        schema:
+          type: integer
+          format: int32
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedQueueMeasurementList'
 components:
   schemas:
     AirportElevation:
@@ -462,8 +374,10 @@ components:
       properties:
         Name:
           type: string
+          description: 'The name of an Airport elevation above sea level.'
         Value:
           type: number
+          description: 'The value of an Airport elevation above sea level.'
         AirportElevationUnitOfMeasurement:
           $ref: '#/components/schemas/AirportElevationUnitOfMeasurement'
     AirportElevationUnitOfMeasurement:
@@ -472,14 +386,15 @@ components:
       properties:
         Name:
           type: string
+          description: 'The name of the unit of measure for an Airport elevation above sea level.'
     AirportFacility:
       type: object
       description: 'Information about an Airport as buildings or infrastructure used to provide services.'
       properties:
-        IATACode:
+        IataCode:
           description: 'Three character IATA code for the Airport.'
           type: string
-        ICAOCode:
+        IcaoCode:
           description: 'Four character ICAO code for the Airport.'
           type: string
         Name:
@@ -496,70 +411,80 @@ components:
           description: 'Coordinate for longitude of the Airport.'
           type: number
         Name:
+          description: 'Unique name for the Airport Location.'
           type: string
-        SRID:
-          description: 'A Spatial Reference System Identifier (SRID), to identify the spatial coordinate system definitions'
+        Srid:
+          description: 'A Spatial Reference System Identifier (SRID), to identify the spatial coordinate system definitions.'
           type: integer
-    CheckPointAreaLocation:
+    CheckpointAreaLocation:
       type: object
       description: 'The geospatial or geopolitical location of a Checkpoint.'
       properties:
         Latitude:
-          description: 'Coordinate of the latitude of the checkpoint area location'
+          description: 'Coordinate of the latitude of the checkpoint area location.'
           type: number
         Longitude:
-          description: 'Coordinate of the longitude of the checkpoint area location'
+          description: 'Coordinate of the longitude of the checkpoint area location.'
           type: number
         Name:
+          description: 'Unique name for geospatial or geopolitical location of a Checkpoint Area Location.'
           type: string
-        SRID:
+        Srid:
           description: 'A Spatial Reference System Identifier (SRID), to identify the spatial coordinate system definitions'
           type: integer
         AirportElevation:
           $ref: '#/components/schemas/AirportElevation'
         ZoneAreaLocation:
           $ref: '#/components/schemas/ZoneAreaLocation'
-    CheckPointFacility:
+    CheckpointFacility:
       type: object
       description: 'Information about a Checkpoint in an Airport used to provide services. A Checkpoint facility is any facility where customers and passengers turn up and need to be processed, serviced or screened before proceeding to the next stage of their journey. '
       properties:
         Description:
+          description: 'Description of the Checkpoint Facility.'
           type: string
         Identifier:
+          description: 'Unique identifier for the Checkpoint Facility. The identifier should be unique within an Airport.'
           type: string
         Name:
+          description: 'Unique name for the Checkpoint Facility. The name should be unique within an Airport.'
           type: string
-        CheckPointAreaLocation:
-          $ref: '#/components/schemas/CheckPointAreaLocation'
-        CheckPointFacilityOperatorParty:
-          $ref: '#/components/schemas/CheckPointFacilityOperatorParty'
-        CheckPointFacilityType:
-          $ref: '#/components/schemas/CheckPointFacilityType'
+        CheckpointAreaLocation:
+          $ref: '#/components/schemas/CheckpointAreaLocation'
+        CheckpointFacilityOperatorParty:
+          $ref: '#/components/schemas/CheckpointFacilityOperatorParty'
+        CheckpointFacilityType:
+          $ref: '#/components/schemas/CheckpointFacilityType'
         ConcourseFacility:
           $ref: '#/components/schemas/ConcourseFacility'
         OperationTimePeriod:
           $ref: '#/components/schemas/OperationTimePeriod'
-    CheckPointFacilityOperatorParty:
+    CheckpointFacilityOperatorParty:
       type: object
       description: 'Information that describes the Party responsible for the operation of a Checkpoint in an Airport.'
       properties:
         Name:
+          description: 'Unique name of the Operator Party for the Checkpoint Facility.'
           type: string
-    CheckPointFacilityType:
+    CheckpointFacilityType:
       type: object
-      description: 'Information that describes the classification for a Checkpoint in an Airport. Values are: Security Screening, Customs'
+      description: 'Information that describes the classification for a Checkpoint in an Airport. Values are: Security Screening, Customs.'
       properties:
         Code:
+          description: 'Unique code for the Checkpoint Facility Type.'
           type: string
         Description:
+          description: 'Description of the Checkpoint Facility Type.'
           type: string
     ConcourseFacility:
       type: object
       description: 'Information about an Airport Concourse as buildings or infrastructure used to provide services.'
       properties:
         Identifier:
+          description: 'Unique identifier for the Concourse Facility.'
           type: string
         Name:
+          description: 'Unique name for the Concourse Facility.'
           type: string
         TerminalFacility:
           $ref: '#/components/schemas/TerminalFacility'
@@ -568,6 +493,7 @@ components:
       description: 'Information about the device (equipment) used to take measurements (observations).'
       properties:
         Name:
+          description: 'Unique name for the Measurement Device.'
           type: string
         MeasurementDeviceLocation:
           $ref: '#/components/schemas/MeasurementDeviceLocation'
@@ -576,6 +502,7 @@ components:
       description: 'The geospatial or geopolitical location of a Measurement Device.'
       properties:
         Name:
+          description: 'Unique name for the location of the Measurement Device.'
           type: string
     MeasurementTimePeriod:
       type: object
@@ -583,19 +510,83 @@ components:
       properties:
         EndTime:
           type: string
+          description: 'The date and time at the end of the time period over which a Measurement is taken. Date time should be UTC, compliant with ISO 8601 format (e.g. 2023-04-20T11:54:59Z)'
     OperationTimePeriod:
       type: object
       description: 'The time period over which the Checkpoint is operating.'
       properties:
         ClosingTime:
+          description: 'The date and time from when the Checkpoint Facility is closed. Date time should be UTC, compliant with ISO 8601 format (e.g. 2023-04-20T11:54:59Z)'
           type: string
         OpeningTime:
+          description: 'The date and time from when the Checkpoint Facility is open. Date time should be UTC, compliant with ISO 8601 format (e.g. 2023-04-20T11:54:59Z)'
           type: string
+    PaginatedCheckpointFacilityList:
+      type: object
+      properties:
+        Count:
+          type: integer
+          example: 123
+        Next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/checkpoints/?page=4
+        Previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/checkpoints/?page=2
+        Results:
+          type: array
+          items:
+            $ref: '#/components/schemas/CheckpointFacility'
+    PaginatedPassengerQueueList:
+      type: object
+      properties:
+        Count:
+          type: integer
+          example: 123
+        Next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/queues/?page=4
+        Previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/queues/?page=2
+        Results:
+          type: array
+          items:
+            $ref: '#/components/schemas/PassengerQueue'
+    PaginatedQueueMeasurementList:
+      type: object
+      properties:
+        Count:
+          type: integer
+          example: 123
+        Next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/measurements/?page=4
+        Previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/measurements/?page=2
+        Results:
+          type: array
+          items:
+            $ref: '#/components/schemas/QueueMeasurement'
     PassengerProcess:
       type: object
       description: 'Information about the Passenger Party Process.'
       properties:
         Name:
+          description: 'Unique name for the Passenger Process.'
           type: string
         PassengerProcessType:
           $ref: '#/components/schemas/PassengerProcessType'
@@ -605,18 +596,22 @@ components:
       properties:
         Code:
           type: string
+          description: 'Unique code for the type of Passenger Party Process.'
         Description:
           type: string
+          description: 'Description of the type of Passenger Party Process.'
     PassengerQueue:
       type: object
-      description: 'Information about the Passenger Party Queue.'
+      description: 'Information about the Passenger Party Queue. A line of people waiting to pass through the security checkpoint process.'
       properties:
         Identifier:
           type: string
+          description: 'Unique identifier for the Passenger Queue. The identifier should be unique within an Airport.'
         Name:
           type: string
-        CheckPointFacility:
-          $ref: '#/components/schemas/CheckPointFacility'
+          description: 'Name of the Passenger Queue. The name should be unique within an Airport.'
+        CheckpointFacility:
+          $ref: '#/components/schemas/CheckpointFacility'
         PassengerProcess:
           $ref: '#/components/schemas/PassengerProcess'
         QueueLocation:
@@ -631,6 +626,7 @@ components:
       properties:
         Name:
           type: string
+          description: 'Unique name for the Queue Location.'
     QueueMeasurement:
       type: object
       description: 'Information about the measurements (observations) of particular Measures of a Passenger Queue.'
@@ -638,14 +634,13 @@ components:
         Occupancy:
           description: 'The count of people in the queue.  The unit of measure is number of people. This metric is updated every five minutes.'
           type: number
-        Projected Wait Time:
+        ProjectedWaitTime:
           description: 'The estimated time that a person entering the queue can expect to wait. The unit of measure is seconds. Estimates are required to be updated every five minutes.'
           type: number
         Throughput:
-          description: 'The average number of passengers processed over the past hour. The unit of measure is passengers per hour. This metric is updated every five minutes.
-'
+          description: 'The average number of passengers processed over the past hour. The unit of measure is passengers per hour. This metric is updated every five minutes.'
           type: number
-        Wait Time:
+        WaitTime:
           description: 'The duration that a person exiting the queue has experienced. The unit of measure is seconds. The amount represents the average number of seconds experienced by people exiting the queue in the last five minutes. The amounts are required to be updated every five minutes.'
           type: number
         MeasurementDevice:
@@ -656,24 +651,28 @@ components:
           $ref: '#/components/schemas/PassengerQueue'
     QueueStatus:
       type: object
-      description: 'Information about the status of a Passenger Queue. Values can be: Open, Closed'
+      description: 'Information about the status of a Passenger Queue. Values can be: Open, Closed.'
       properties:
         Name:
           type: string
+          description: 'Unique name for the status of the Passenger Queue.'
     QueueType:
       type: object
-      description: 'Information about the type of a Passenger Queue. Values can be: Pre-Check, Private, Economy, Priority, KnownCrewMember'
+      description: 'Information about the type of a Passenger Queue. Values can be: Pre-Check, Private, Economy, Priority, KnownCrewMember.'
       properties:
         Code:
           type: string
+          description: 'Unique code for the type of Passenger Queue.'
         Description:
           type: string
+          description: 'Description of the type of Passenger Queue.'
     TerminalAreaLocation:
       type: object
       description: 'The geospatial or geopolitical location of an Airport Terminal building.'
       properties:
         Name:
           type: string
+          description: 'Unique name for the Terminal Area Location.'
         AirportLocation:
           $ref: '#/components/schemas/AirportLocation'
     TerminalFacility:
@@ -682,8 +681,10 @@ components:
       properties:
         Identifier:
           type: string
+          description: 'Unique identifier for the Terminal Facility.'
         Name:
           type: string
+          description: 'Unique name for the Terminal Facility.'
         AirportFacility:
           $ref: '#/components/schemas/AirportFacility'
     ZoneAreaLocation:
@@ -692,23 +693,6 @@ components:
       properties:
         Name:
           type: string
+          description: 'Unique name for the Zone Area Location.'
         TerminalAreaLocation:
           $ref: '#/components/schemas/TerminalAreaLocation'
-    CurrentWaitTime:
-      type: object
-      properties:
-        Occupancy:
-          description: 'The count of people in the queue.  The unit of measure is number of people. This metric is updated every five minutes.'
-          type: integer
-        Projected Wait Time:
-          description: 'The estimated time that a person entering the queue can expect to wait. The unit of measure is seconds. Estimates are required to be updated every five minutes.'
-          type: integer
-        Throughput:
-          description: 'The average number of passengers processed over the past hour. The unit of measure is passengers per hour. This metric is updated every five minutes.'
-          type: integer
-        Wait Time:
-          description: 'The duration that a person exiting the queue has experienced. The unit of measure is seconds. The amount represents the average number of seconds experienced by people exiting the queue in the last five minutes. The amounts are required to be updated every five minutes.'
-          type: integer
-        EndTime:
-          type: string
-          description: "End of measurement, in ISO 8601 format: (e.g. 2001-12-31T23:59:59Z)"
